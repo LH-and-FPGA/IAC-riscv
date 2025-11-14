@@ -30,7 +30,7 @@ module controlpath #(
         .rs2(rs2),
         .funct7(alu_funct7),
         .imm32(imm32)
-    )
+    );
 
 
     
