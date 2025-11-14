@@ -38,12 +38,12 @@ for file in "${files[@]}"; do
         name="top"
     fi
 
-    # Automatically detect latest GoogleTest installation under Homebrew
-    GTEST_BASE=$(brew --prefix googletest 2>/dev/null)
-    if [ -z "$GTEST_BASE" ]; then
-        echo "${RED}Error: GoogleTest not found via Homebrew.${RESET}"
-        exit 1
-    fi
+    # # Automatically detect latest GoogleTest installation under Homebrew
+    # GTEST_BASE=$(brew --prefix googletest 2>/dev/null)
+    # if [ -z "$GTEST_BASE" ]; then
+    #     echo "${RED}Error: GoogleTest not found via Homebrew.${RESET}"
+    #     exit 1
+    # fi
     
     # Construct include and lib paths dynamically
     GTEST_INCLUDE="$GTEST_BASE/include"

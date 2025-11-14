@@ -5,7 +5,7 @@ module instr_mem #(
 ) (
     input   logic clk,
     input   logic [ADDRESS_WIDTH-1:0] addr,
-    output  logic [DATA_WIDTH-1:0] instr,
+    output  logic [DATA_WIDTH-1:0] instr
 );
 
 logic [DATA_WIDTH-1:0] rom_array [ROM_SIZE-1:0];

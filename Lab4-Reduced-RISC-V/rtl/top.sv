@@ -44,7 +44,7 @@ module top #(
         .b(op2),
         .alu_out(alu_out),
         .zero_flag(zero)
-    )
+    );
 
     pc_top PC_TOP(
         .en(en),
@@ -66,6 +66,6 @@ module top #(
         .r_addr1(op1),
         .r_addr2(op2),
         .a0(a0)
-    )
+    );
 
 endmodule
