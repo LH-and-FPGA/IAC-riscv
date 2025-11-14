@@ -12,6 +12,7 @@ module top #(
     logic                   alu_src;
     logic                   reg_write;
     logic                   zero;
+    logic                   branch;
     logic [3:0]             alu_ctrl;
     logic [DATA_WIDTH-1:0]  ins;
     logic [DATA_WIDTH-1:0]  pc;
@@ -38,7 +39,8 @@ module top #(
         .rd(rd),
         .rs1(rs1),
         .rs2(rs2),
-        .imm32(imm32)
+        .imm32(imm32),
+        .branch(branch)
     );
 
     assign alu_operand_b = alu_src ? imm32 : op2;
@@ -55,7 +57,7 @@ module top #(
         .en(en),
         .clk(clk),
         .rst(rst),
-        .pc_src(zero),
+        .pc_src(branch & zero), // only set pc_src when opcode is 7'b1100011 and zero flag is set
         .imm(imm32),
         .pc(pc)
     );

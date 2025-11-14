@@ -2,57 +2,36 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
-#include <iomanip>
-#include <iostream>
-
 static constexpr vluint64_t MAX_SIM_CYC = 2000;
 
 int main(int argc, char **argv) {
-    VerilatedContext context;
-    context.commandArgs(argc, argv);
+    int simcyc;     // simulation clock count
+    int tick;       // each clk cycle has two ticks for two edges
 
-    Vtop top{&context};
-
-#if VM_TRACE
-    context.traceEverOn(true);
+    Verilated::commandArgs(argc, argv);
+    // enable tracing before module construction so Verilator registers signals
+    Verilated::traceEverOn(true);
+    // init top verilog instance
+    Vtop *top = new Vtop;
+    // init trace dump
     VerilatedVcdC *tfp = new VerilatedVcdC;
-    top.trace(tfp, 99);
+    top->trace(tfp, 99);
     tfp->open("top_tb.vcd");
-#endif
 
-    vluint64_t sim_time = 0;
-    auto tick = [&](bool clk_level) {
-        top.clk = clk_level;
-        top.eval();
-#if VM_TRACE
-        tfp->dump(sim_time);
-#endif
-        ++sim_time;
-    };
+    top->clk = 0;
+    top->rst = 0;
+    top->en = 1;
 
-    top.rst = 1;
-    top.en = 0;
-
-    while (!context.gotFinish() && (sim_time < MAX_SIM_CYC * 2)) {
-        if (sim_time == 4) {
-            top.rst = 0;
+    for (simcyc = 0; simcyc < MAX_SIM_CYC; simcyc++)
+    {
+        // dump variables into VCD file and toggle clock
+        for (tick = 0; tick < 2; tick++)
+        {
+            tfp->dump(2 * simcyc + tick);
+            top->clk = !top->clk;
+            top->eval();
         }
-        if (sim_time == 6) {
-            top.en = 1;
-        }
-
-        tick(false);
-        tick(true);
     }
-
-    std::cout << "Simulation finished after " << sim_time / 2 << " cycles. "
-              << "a0 = 0x" << std::hex << std::setw(8) << std::setfill('0')
-              << top.a0 << std::dec << std::endl;
-
-#if VM_TRACE
     tfp->close();
-    delete tfp;
-#endif
-
-    return 0;
+    exit(0);
 }
