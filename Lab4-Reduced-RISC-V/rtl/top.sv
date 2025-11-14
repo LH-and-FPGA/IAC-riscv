@@ -55,7 +55,7 @@ module top #(
         .en(en),
         .clk(clk),
         .rst(rst),
-        .pc_src(!zero),
+        .pc_src(zero),
         .imm(imm32),
         .pc(pc)
     );
