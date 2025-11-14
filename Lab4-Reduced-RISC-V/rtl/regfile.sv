@@ -1,6 +1,6 @@
 module regfile #(
-    DATA_WIDTH = 32,
-    REG_NUM = 32,
+    parameter DATA_WIDTH = 32,
+    parameter REG_NUM = 32,
     parameter ADDR_WIDTH = $clog2(REG_NUM)
 ) (
     input   logic       clk,
