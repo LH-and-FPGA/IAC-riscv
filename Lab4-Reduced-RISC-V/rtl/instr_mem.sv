@@ -1,6 +1,6 @@
 module instr_mem #(
     parameter DATA_WIDTH = 32,
-    parameter ADDRESS_WIDTH = 10,
+    parameter ADDRESS_WIDTH = 32,
     parameter ROM_SIZE = 1024
 ) (
     input   logic clk,
