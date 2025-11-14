@@ -3,20 +3,20 @@ module alu #(
 ) (
     input   logic [DATA_WIDTH-1:0] a,
     input   logic [DATA_WIDTH-1:0] b,
-    input   logic [3:0]            alu_ctrl,
+    input   logic [6:0]            alu_ctrl,
     output  logic [DATA_WIDTH-1:0] alu_out,
     output logic                  zero_flag
 );
 
-    localparam ALU_ADD  = 4'b0000;
-    localparam ALU_SUB  = 4'b0001;
-    localparam ALU_AND  = 4'b0010;
-    localparam ALU_OR   = 4'b0011;
-    localparam ALU_XOR  = 4'b0100;
-    localparam ALU_SLT  = 4'b0101; 
-    localparam ALU_SLL  = 4'b0110; 
-    localparam ALU_SRL  = 4'b0111; 
-    localparam ALU_SRA  = 4'b1000; 
+    localparam ALU_ADD  = 7'b0000;
+    localparam ALU_SUB  = 7'b0001;
+    localparam ALU_AND  = 7'b0010;
+    localparam ALU_OR   = 7'b0011;
+    localparam ALU_XOR  = 7'b0100;
+    localparam ALU_SLT  = 7'b0101; 
+    localparam ALU_SLL  = 7'b0110; 
+    localparam ALU_SRL  = 7'b0111; 
+    localparam ALU_SRA  = 7'b1000; 
 
     always_comb begin
         case (alu_ctrl)
