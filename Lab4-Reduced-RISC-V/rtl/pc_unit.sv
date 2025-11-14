@@ -1,12 +1,12 @@
 module pc_top #(
-    DATA_WIDTH = 32
-)(
-    input logic en,
-    input logic clk,
-    input logic rst,
-    input logic pc_src,
-    input logic imm,
-    output logic [DATA_WIDTH-1:0] pc,
+    parameter DATA_WIDTH = 32
+) (
+    input   logic en,
+    input   logic clk,
+    input   logic rst,
+    input   logic pc_src,
+    input   logic [DATA_WIDTH-1:0]  imm,
+    output  logic [DATA_WIDTH-1:0]  pc,
 )
 
 logic [DATA_WIDTH-1:0] branch_pc;
