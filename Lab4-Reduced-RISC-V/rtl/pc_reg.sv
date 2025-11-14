@@ -9,7 +9,7 @@ module pc_reg #(
 );
 
 always_ff @(posedge clk)
-    if (rst) pc <= {WIDTH{1'b0}};
-    else     pc <= next_pc;
+    if (rst)        pc <= '0;
+    else if (en)    pc <= next_pc;
 
 endmodule

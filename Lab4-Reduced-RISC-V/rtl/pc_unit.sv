@@ -7,10 +7,10 @@ module pc_top #(
     input   logic pc_src,
     input   logic [DATA_WIDTH-1:0]  imm,
     output  logic [DATA_WIDTH-1:0]  pc,
-)
+);
 
 logic [DATA_WIDTH-1:0] branch_pc;
-logic [DATA_WIDTH-1:0] next_pc
+logic [DATA_WIDTH-1:0] inc_pc;
 logic [DATA_WIDTH-1:0] prev_pc;
 logic [DATA_WIDTH-1:0] next_pc;
 
@@ -19,19 +19,21 @@ pc_reg #(.DATA_WIDTH(DATA_WIDTH)) u_pc_reg (
     .clk(clk),
     .rst(rst),
     .next_pc(next_pc),
-    .pc(prev_pc),
+    .pc(prev_pc)
 );
 
 pc_mux #(.DATA_WIDTH(DATA_WIDTH)) u_pc_mux (
     .pc_src(pc_src),
     .branch_pc(branch_pc),
-    .inc_pc (inc_pc),
-    .next_pc (next_pc)
+    .inc_pc(inc_pc),
+    .next_pc(next_pc)
 );
 
 adder_branch #(.DATA_WIDTH(DATA_WIDTH)) u_adder_branch (
     .en(en),
-    .pc(prev_pc)
+    .pc(prev_pc),
+    .imm(imm),
+    .pc_branch(branch_pc)
 );
 
 adder_inc4 #(.DATA_WIDTH(DATA_WIDTH)) u_adder_inc (
@@ -39,5 +41,7 @@ adder_inc4 #(.DATA_WIDTH(DATA_WIDTH)) u_adder_inc (
     .in(prev_pc),
     .out(inc_pc)
 );
+
+assign pc = prev_pc;
 
 endmodule

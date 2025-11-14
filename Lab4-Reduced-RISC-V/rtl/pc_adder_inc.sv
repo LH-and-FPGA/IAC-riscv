@@ -6,6 +6,6 @@ module adder_inc4 #(
     output  logic [DATA_WIDTH-1:0]  out
 );
 
-if (en) assign out = in + 4;
+assign out = en ? in + DATA_WIDTH'(32'd4) : in;
 
 endmodule
