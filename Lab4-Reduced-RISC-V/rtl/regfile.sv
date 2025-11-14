@@ -18,7 +18,7 @@ module regfile #(
     logic [DATA_WIDTH-1:0] regs [0:REG_NUM-1];
 
     // sync read
-    always_ff @(posedge clk or posedge rst) begin
+    always_ff @(posedge clk) begin
         if (rst) begin
             for (int i = 0; i < REG_NUM; i++)
                 regs[i] <= '0; // all zero

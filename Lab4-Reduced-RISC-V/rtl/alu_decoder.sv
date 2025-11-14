@@ -1,6 +1,4 @@
-module alu_decoder #(
-    parameter DATA_WIDTH = 32
-) (
+module alu_decoder (
     input   logic [2:0] funct3,
     input   logic [6:0] funct7,
     input   logic [6:0] opcode,
