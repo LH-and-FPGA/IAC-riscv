@@ -13,10 +13,31 @@ class Vdut___024root final : public VerilatedModule {
   public:
 
     // DESIGN SPECIFIC STATE
-    VL_IN8(sel,0,0);
-    VL_IN(in0,31,0);
-    VL_IN(in1,31,0);
-    VL_OUT(out,31,0);
+    VL_IN8(clk,0,0);
+    VL_IN8(rst,0,0);
+    VL_IN8(en,0,0);
+    CData/*3:0*/ top__DOT__alu_ctrl;
+    CData/*4:0*/ top__DOT__rd;
+    CData/*4:0*/ top__DOT__rs1;
+    CData/*4:0*/ top__DOT__rs2;
+    CData/*6:0*/ top__DOT__CONTROLPATH__DOT__opcode;
+    CData/*2:0*/ top__DOT__CONTROLPATH__DOT__alu_funct3;
+    CData/*6:0*/ top__DOT__CONTROLPATH__DOT__alu_funct7;
+    CData/*0:0*/ __Vclklast__TOP__clk;
+    CData/*0:0*/ __Vclklast__TOP__rst;
+    VL_OUT(a0,31,0);
+    IData/*31:0*/ top__DOT__ins;
+    IData/*31:0*/ top__DOT__imm32;
+    IData/*31:0*/ top__DOT__alu_out;
+    IData/*31:0*/ top__DOT__op1;
+    IData/*31:0*/ top__DOT__alu_operand_b;
+    IData/*31:0*/ top__DOT__PC_TOP__DOT__branch_pc;
+    IData/*31:0*/ top__DOT__PC_TOP__DOT__inc_pc;
+    IData/*31:0*/ top__DOT__PC_TOP__DOT__prev_pc;
+    IData/*31:0*/ top__DOT__REGFILE__DOT__unnamedblk1__DOT__i;
+    VlUnpacked<IData/*31:0*/, 1024> top__DOT__INSTR_MEM__DOT__rom_array;
+    VlUnpacked<IData/*31:0*/, 32> top__DOT__REGFILE__DOT__regs;
+    VlUnpacked<CData/*0:0*/, 4> __Vm_traceActivity;
 
     // INTERNAL VARIABLES
     Vdut__Syms* const vlSymsp;

@@ -25,10 +25,10 @@ class Vdut VL_NOT_FINAL : public VerilatedModel {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
-    VL_IN8(&sel,0,0);
-    VL_IN(&in0,31,0);
-    VL_IN(&in1,31,0);
-    VL_OUT(&out,31,0);
+    VL_IN8(&clk,0,0);
+    VL_IN8(&rst,0,0);
+    VL_IN8(&en,0,0);
+    VL_OUT(&a0,31,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

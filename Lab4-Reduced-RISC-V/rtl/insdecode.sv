@@ -59,7 +59,7 @@ module insdecode #(
 
             OPC_J: begin
                 rd      = ins[11:7];
-                imm32   = {{11{ins[31]}}, ins[31], ins[19:12], ins[20], ins[30:20], 1'b0};
+                imm32   = {{11{ins[31]}}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
             end
 
             OPC_U: begin

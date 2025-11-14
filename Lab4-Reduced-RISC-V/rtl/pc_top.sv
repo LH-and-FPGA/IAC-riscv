@@ -29,14 +29,14 @@ pc_mux #(.DATA_WIDTH(DATA_WIDTH)) u_pc_mux (
     .next_pc(next_pc)
 );
 
-adder_branch #(.DATA_WIDTH(DATA_WIDTH)) u_adder_branch (
+pc_adder_branch #(.DATA_WIDTH(DATA_WIDTH)) u_adder_branch (
     .en(en),
     .pc(prev_pc),
     .imm(imm),
     .pc_branch(branch_pc)
 );
 
-adder_inc4 #(.DATA_WIDTH(DATA_WIDTH)) u_adder_inc (
+pc_adder_inc4 #(.DATA_WIDTH(DATA_WIDTH)) u_adder_inc (
     .en(en),
     .in(prev_pc),
     .out(inc_pc)

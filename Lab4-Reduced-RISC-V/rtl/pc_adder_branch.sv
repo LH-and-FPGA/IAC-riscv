@@ -1,4 +1,4 @@
-module adder_branch #(
+module pc_adder_branch #(
     parameter DATA_WIDTH = 32
 )(
     input   logic en,

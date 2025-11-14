@@ -43,7 +43,7 @@ VM_USER_LDLIBS = \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
-	mux_tb \
+	verify \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
@@ -59,7 +59,7 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
-mux_tb.o: /home/han/IC/IAC-riscv/Lab4-Reduced-RISC-V/tb/tests/mux_tb.cpp
+verify.o: /home/han/IC/IAC-riscv/Lab4-Reduced-RISC-V/tb/tests/verify.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)
