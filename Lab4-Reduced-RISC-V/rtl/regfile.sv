@@ -3,15 +3,16 @@ module regfile #(
     parameter REG_NUM = 32,
     parameter ADDR_WIDTH = $clog2(REG_NUM)
 ) (
-    input   logic       clk,
-    input   logic       rst,
-    input   logic       we, // write enable
-    input   logic [ADDR_WIDTH-1:0] w_addr,
-    input   logic [ADDR_WIDTH-1:0] r_addr1,
-    input   logic [ADDR_WIDTH-1:0] r_addr2,
-    output  logic [DATA_WIDTH-1:0] w_data,
-    output  logic [DATA_WIDTH-1:0] r_data1,
-    output  logic [DATA_WIDTH-1:0] r_data2
+    input   logic                   clk,
+    input   logic                   rst,
+    input   logic                   we,         // write enable
+    input   logic [ADDR_WIDTH-1:0]  w_addr,     // rd
+    input   logic [ADDR_WIDTH-1:0]  r_addr1,    // rs
+    input   logic [ADDR_WIDTH-1:0]  r_addr2,    // rs
+    output  logic [DATA_WIDTH-1:0]  w_data,
+    output  logic [DATA_WIDTH-1:0]  r_data1,
+    output  logic [DATA_WIDTH-1:0]  r_data2,
+    output  logic [DATA_WIDTH-1:0]  a0          // For testing, we directly output the result
 );
     // REGfile itself
     logic [DATA_WIDTH-1:0] regs [0:REG_NUM-1];
@@ -33,6 +34,7 @@ module regfile #(
     always_comb begin
         r_data1 = (r_addr1 == '0) ? '0 : regs[r_addr1];
         r_data2 = (r_addr2 == '0) ? '0 : regs[r_addr2];
+        a0      = (rd_addr == '0) ? '0 : regs[w_addr];
     end
 
 endmodule

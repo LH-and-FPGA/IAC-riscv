@@ -7,6 +7,8 @@ module controlpath #(
     output logic [ADDR_WIDTH-1:0] reg_write,
     output logic [9:0] alu_ctrl,
     output logic alu_src,
+    output logic [ADDR_WIDTH-1:0] rs1,
+    output logic [ADDR_WIDTH-1:0] rs2
     
 );
     
