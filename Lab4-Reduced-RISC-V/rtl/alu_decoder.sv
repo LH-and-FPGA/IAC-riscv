@@ -3,8 +3,9 @@ module alu_decoder #(
 ) (
     input   logic [2:0] funct3,
     input   logic [6:0] funct7,
-    input   logic  b5,
-    output logic [3:0]  alu_ctrl
+    input   logic [6:0] opcode,
+    output  logic [3:0] alu_ctrl,
+    output  logic       alu_src 
 );
 always_comb begin
         case (funct3)
@@ -17,7 +18,8 @@ always_comb begin
             3'b101: alu_ctrl = (funct7 == 7'b0000000) ? 4'b0111 : 4'b1000; // SRL or SRA
             default: alu_ctrl = 4'b1111; // NOP or undefined
         endcase
+        if (opcode == 7'b0110011) alu_src = 1'b0;
+        else alu_src = 1'b1;
     end
-
     
 endmodule
