@@ -9,7 +9,7 @@ module regfile #(
     input   logic [ADDR_WIDTH-1:0]  w_addr,     // rd
     input   logic [ADDR_WIDTH-1:0]  r_addr1,    // rs
     input   logic [ADDR_WIDTH-1:0]  r_addr2,    // rs
-    output  logic [DATA_WIDTH-1:0]  w_data,
+    input   logic [DATA_WIDTH-1:0]  w_data,
     output  logic [DATA_WIDTH-1:0]  r_data1,
     output  logic [DATA_WIDTH-1:0]  r_data2,
     output  logic [DATA_WIDTH-1:0]  a0          // For testing, we directly output the result
@@ -23,7 +23,7 @@ module regfile #(
             for (int i = 0; i < REG_NUM; i++)
                 regs[i] <= '0; // all zero
         end else begin
-            if (we && (w_Addr != '0)) begin
+            if (we && (w_addr != '0)) begin
                 regs[w_addr] <= w_data;
             end
             regs[0] <= '0;
@@ -34,7 +34,7 @@ module regfile #(
     always_comb begin
         r_data1 = (r_addr1 == '0) ? '0 : regs[r_addr1];
         r_data2 = (r_addr2 == '0) ? '0 : regs[r_addr2];
-        a0      = (rd_addr == '0) ? '0 : regs[w_addr];
+        a0      = regs[10];
     end
 
 endmodule

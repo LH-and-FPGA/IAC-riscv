@@ -5,10 +5,10 @@ module insdecode #(
 ) (
     input   logic [DATA_WIDTH-1:0]  ins,
     output  logic [6:0]             opcode,
-    output  logic [4:0]             rd,
+    output  logic [ADDR_WIDTH-1:0]  rd,
     output  logic [2:0]             funct3,
-    output  logic [4:0]             rs1,
-    output  logic [4:0]             rs2,
+    output  logic [ADDR_WIDTH-1:0]  rs1,
+    output  logic [ADDR_WIDTH-1:0]  rs2,
     output  logic [6:0]             funct7,
     output  logic [31:0]            imm32
 );
@@ -40,7 +40,7 @@ module insdecode #(
                 rd      = ins[11:7];
                 funct3  = ins[14:12];
                 rs1     = ins[19:15];
-                imm32   = {20{ins[31]}, ins[31:20]};
+                imm32   = {{20{ins[31]}}, ins[31:20]};
             end
 
             OPC_S: begin

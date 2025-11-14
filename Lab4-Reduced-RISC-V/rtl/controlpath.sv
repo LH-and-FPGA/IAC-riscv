@@ -7,9 +7,10 @@ module controlpath #(
     output  logic                   alu_src,    // imm (==1) or from reg (==0)
     output  logic                   reg_write,
     output  logic [3:0]             alu_ctrl,   // for our ALU
+    output  logic [ADDR_WIDTH-1:0]  rd,
     output  logic [ADDR_WIDTH-1:0]  rs1,
     output  logic [ADDR_WIDTH-1:0]  rs2,
-    output  loigc [DATA_WIDTH-1:0]  imm32
+    output  logic [DATA_WIDTH-1:0]  imm32
 );
     logic [6:0] opcode;
     logic [2:0] alu_funct3;
@@ -35,8 +36,7 @@ module controlpath #(
     );
 
     always_comb begin
-        if rd != ADDR_WIDTH'b0 reg_write = 1;
-        else reg_write = 0;
+        reg_write = (rd != '0);
     end
 
 

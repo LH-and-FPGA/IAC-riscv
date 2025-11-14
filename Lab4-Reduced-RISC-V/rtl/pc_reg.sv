@@ -5,7 +5,7 @@ module pc_reg #(
     input   logic clk,
     input   logic rst,
     input   logic [DATA_WIDTH-1:0] next_pc,
-    output  logic [DATA_WIDTH-1:0] pc,
+    output  logic [DATA_WIDTH-1:0] pc
 );
 
 always_ff @(posedge clk)

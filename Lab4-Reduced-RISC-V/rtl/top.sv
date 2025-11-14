@@ -9,18 +9,20 @@ module top #(
     output  logic [DATA_WIDTH-1:0] a0    
 );
     // assign a0 = 32'd5;
-    logic [DATA_WIDTH-1:0] ins;
-    logic [DATA_WIDTH-1:0] pc;
-    logic alu_src;
-    logic reg_write;
-    logic zero;
-    logic [3:0] alu_ctrl;
+    logic                   alu_src;
+    logic                   reg_write;
+    logic                   zero;
+    logic [3:0]             alu_ctrl;
+    logic [DATA_WIDTH-1:0]  ins;
+    logic [DATA_WIDTH-1:0]  pc;
+    logic [ADDR_WIDTH-1:0]  rd;
     logic [ADDR_WIDTH-1:0]  rs1;
     logic [ADDR_WIDTH-1:0]  rs2;
     logic [DATA_WIDTH-1:0]  imm32;
     logic [DATA_WIDTH-1:0]  alu_out;
     logic [DATA_WIDTH-1:0]  op1;
     logic [DATA_WIDTH-1:0]  op2;
+    logic [DATA_WIDTH-1:0]  alu_operand_b;
     
     instr_mem INSTR_MEM(
         .clk(clk),
@@ -33,15 +35,18 @@ module top #(
         .alu_ctrl(alu_ctrl),
         .reg_write(reg_write),
         .alu_src(alu_src),
+        .rd(rd),
         .rs1(rs1),
         .rs2(rs2),
         .imm32(imm32)
     );
 
+    assign alu_operand_b = alu_src ? imm32 : op2;
+
     alu ALU(
         .alu_ctrl(alu_ctrl),
         .a(op1),
-        .b(op2),
+        .b(alu_operand_b),
         .alu_out(alu_out),
         .zero_flag(zero)
     );
@@ -63,8 +68,8 @@ module top #(
         .r_addr1(rs1),
         .r_addr2(rs2),
         .w_data(alu_out),
-        .r_addr1(op1),
-        .r_addr2(op2),
+        .r_data1(op1),
+        .r_data2(op2),
         .a0(a0)
     );
 

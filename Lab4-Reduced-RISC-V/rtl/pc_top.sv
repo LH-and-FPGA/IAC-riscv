@@ -6,7 +6,7 @@ module pc_top #(
     input   logic rst,
     input   logic pc_src,
     input   logic [DATA_WIDTH-1:0]  imm,
-    output  logic [DATA_WIDTH-1:0]  pc,
+    output  logic [DATA_WIDTH-1:0]  pc
 );
 
 logic [DATA_WIDTH-1:0] branch_pc;
