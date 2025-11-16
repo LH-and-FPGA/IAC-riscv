@@ -57,7 +57,7 @@ module top #(
         .en(en),
         .clk(clk),
         .rst(rst),
-        .pc_src(branch & zero), // only set pc_src when opcode is 7'b1100011 and zero flag is set
+        .pc_src(branch & !zero), // only set pc_src when opcode is 7'b1100011 and zero flag is not set
         .imm(imm32),
         .pc(pc)
     );
