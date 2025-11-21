@@ -3,7 +3,11 @@ module ifu #(
     DATA_WIDTH = 32,
     ADDR_WIDTH = 32
 ) (
-    port_list
+    input  logic                clk, rst,
+    input  logic                StallF, StallD, StallE, StallM, StallW,
+    input  logic                FlushD, FlushE, FlushM, FlushW,
+    
+
 );
     
 endmodule
