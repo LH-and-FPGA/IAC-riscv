@@ -12,7 +12,7 @@ module alu #(
             4'b0000:  alu_out = a + b;
             4'b0001:  alu_out = a - b;
             4'b0010:  alu_out = a & b;
-            4'b0011:   alu_out = a | b;
+            4'b0011:  alu_out = a | b;
             4'b0100:  alu_out = a ^ b;
             4'b0101:  alu_out = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
             4'b0110:  alu_out = a << b[4:0];

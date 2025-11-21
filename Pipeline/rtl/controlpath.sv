@@ -7,6 +7,7 @@ module controlpath #(
     output  logic                   alu_src,    // imm (==1) or from reg (==0)
     output  logic                   reg_write,
     output  logic [3:0]             alu_ctrl,   // for our ALU
+    output  logic                   branch,
     output  logic [ADDR_WIDTH-1:0]  rd,
     output  logic [ADDR_WIDTH-1:0]  rs1,
     output  logic [ADDR_WIDTH-1:0]  rs2,
@@ -36,7 +37,8 @@ module controlpath #(
     );
 
     always_comb begin
-        reg_write = (rd != '0);
+        branch = (opcode == 7'b1100011);
+        reg_write = (branch) ? 1'b0 : (rd != '0);
     end
 
 
