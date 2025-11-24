@@ -1,4 +1,4 @@
-#include "Vtop.h"
+#include "Vcore_top.h"
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
     // enable tracing before module construction so Verilator registers signals
     Verilated::traceEverOn(true);
     // init top verilog instance
-    Vtop *top = new Vtop;
+    Vcore_top *top = new Vcore_top;
     // init trace dump
     VerilatedVcdC *tfp = new VerilatedVcdC;
     top->trace(tfp, 99);
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     top->en = 1;
 
     for (simcyc = 0; simcyc < MAX_SIM_CYC; simcyc++)
-    {
+    {   
         // dump variables into VCD file and toggle clock
         for (tick = 0; tick < 2; tick++)
         {
