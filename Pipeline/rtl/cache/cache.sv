@@ -23,11 +23,30 @@ module cache #(
     SET_LEN     = 6,
     TAG_LEN     = 22
 ) (
+    // general signals
     input logic clk,
     input logic reset,
-    input logic stall,
-    input logic flush,
-    input logic 
+    input logic stall_stage,
+    input logic flush_stage,
+    input logic flush_cache, // move dirty data back to memory
+    input logic invalidate_cache, // invalidate all cache content, set vaild bits to 0
+
+    // interface with CPU
+    input logic [1:0] cache_type, // 00: read, 01: write
+    input logic [DATA_WIDTH-1:0] physical_addr,
+    input logic [DATA_WIDTH-1:0] write_data,
+    input logic [DATA_WIDTH/8-1:0] byte_mask,
+
+    // Output to CPU
+    output logic [DATA_WIDTH-1:0] read_data, // data read from cache to CPU
+    output logic cache_miss, // signal to indicate cache miss, sorry for that
+    output logic cache_hit, // signal to indicate cache hit, congrats
+
+    output logic cache_committed, // leave me alone, stall signal to CPU, as cache is busy due to bus operation
+    output logic cache_stall, // leave me alone, signal to CPU to indicate cache is busy due to flush or invalidate operation
+    
+
+
 );
     
 endmodule
