@@ -44,7 +44,10 @@ module cache #(
 
     output logic cache_committed, // leave me alone, stall signal to CPU, as cache is busy due to bus operation
     output logic cache_stall, // leave me alone, signal to CPU to indicate cache is busy due to flush or invalidate operation
-    
+
+    // Bus interface
+    input logic bus_ready, // signal from bus to indicate data is ready
+    input logic 
 
 
 );
