@@ -66,11 +66,11 @@ assign i_addr     = pc_cur;
 // IF/ID pipeline register
 always_ff @(posedge clk) begin
   if (rst || FlushD) begin
-    pc_d         <= '0;
-    instr_d      <= NOP;
+    pc_d    <= '0;
+    instr_d <= NOP;
   end else if (!StallD) begin
-    pc_d         <= pc_cur;
-    instr_d      <= instr_in;
+    pc_d    <= pc_cur;
+    instr_d <= instr_in;
   end
 end
 
