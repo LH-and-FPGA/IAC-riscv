@@ -168,19 +168,14 @@ module set_assoc_cache #(
 
     // Bus controls for writeback of dirty victim
     assign miss_int = req && !hit;
-    assign bus_req   = 1'b1;
     assign bus_we    = miss_int && valid_out[victim_way] && dirty_out[victim_way] && !READ_ONLY;
+    assign bus_req   = bus_we | miss_int; // request on miss (and writeback if dirty)
     assign bus_addr  = bus_we ? {tag_out[victim_way], index, {OFFSET_BITS{1'b0}}} :
                        {addr[31:OFFSET_BITS], {OFFSET_BITS{1'b0}}};
     assign bus_wline = line_out[victim_way];
     assign bus_wmask = {LINE_BYTES{1'b1}};
 
-    /* verilator lint_off UNUSED */
-    logic unused_bus_ready;
-    assign unused_bus_ready = bus_ready;
-    /* verilator lint_on UNUSED */
-
-    assign ready = 1'b1;
+    assign ready = ~miss_int | bus_ready;
     assign miss  = miss_int;
 endmodule
 /* verilator lint_on UNOPTFLAT */
