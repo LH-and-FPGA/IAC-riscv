@@ -1,25 +1,18 @@
 module shifter #(
     parameter DATA_WIDTH = 32
 )(
-    input  logic [DATA_WIDTH-1:0] A,      
-    input  logic [4:0]      Amt,    // shift amount
-    input  logic            Right,  // 1 shift right, 0 shift left
-    input  logic            Arith,  // 1 arithmetic shift right, 0 logical
-    output logic [DATA_WIDTH-1:0] Y       
+    input  logic [DATA_WIDTH-1:0] a,      
+    input  logic [4:0]            Amt,    
+    input  logic [1:0]            dir,     // 0=left,1=right logical,2=right arithmetic
+    output logic [DATA_WIDTH-1:0] y      
 );
 
     always_comb begin
-        if (!Right) begin
-            // SLL / SLLI
-            Y = A << Amt;
-        end else begin
-            if (Arith)
-                // SRA / SRAI
-                Y = $signed(A) >>> Amt;
-            else
-                // SRL / SRLI
-                Y = A >> Amt;
-        end
+        case (dir)
+            2'd0: y = a << Amt;
+            2'd1: y = a >> Amt;
+            default: y = $signed(a) >>> Amt;
+        endcase
     end
 
 endmodule

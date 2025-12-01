@@ -1,129 +1,103 @@
-module datapath #(
-    parameter DATA_WIDTH = 32
-)(
-    input  logic                     clk,
-    input  logic                     rst,
+module datapath (
+    input  logic         clk,
+    input  logic         rst,
 
-    // Decode stage
-    input  logic [2:0]               ImmSrcD,
-    input  logic [31:0]              InstrD,
-    input  logic [4:0]               Rs1D,
-    input  logic [4:0]               Rs2D,
-    input  logic [4:0]               Rs2E,
+    // instruction + control
+    input  logic [31:0]  instr,
+    input  logic         regWrite,
+    input  logic         memRead,
+    input  logic         memWrite,
+    input  logic [1:0]   resultSrc,
+    input  logic         aluSrc,
+    input  logic         aluSrcA_PC,
+    input  logic         branch,
+    input  logic         jump,
+    input  logic         jalr,
+    input  logic [4:0]   aluControl,
 
-    input  logic [4:0]               RdW,
-    // Execute stage control
-    input  logic [3:0]               ALUCtrlE, 
-    input  logic                     ALUSrcAE,
-    input  logic                     ALUSrcBE,
-    input  logic                     BranchSignedE,
-    input  logic                     JumpE,
-    input  logic                     ALUResultSrcE,
+    // memory IO
+    input  logic [31:0]  mem_rdata,
+    output logic [31:0]  mem_addr,
+    output logic [31:0]  mem_wdata,
 
-    input  logic [DATA_WIDTH-1:0]    PCE,
-    input  logic [DATA_WIDTH-1:0]    PCLinkE,
-
-    // Forwarding control
-    input  logic [1:0]               ForwardAE,
-    input  logic [1:0]               ForwardBE,
-
-    // Stall / Flush
-    input  logic                     StallE,
-    input  logic                     StallM,
-    input  logic                     StallW,
-    input  logic                     FlushE,
-    input  logic                     FlushM,
-    input  logic                     FlushW,
-
-    // ALU outputs to IEU
-    output logic [DATA_WIDTH-1:0]    IEUAdrE,
-    output logic [1:0]               FlagsE,         // {eq, lt}
-    output logic [DATA_WIDTH-1:0]    ForwardedSrcAE,
-    output logic [DATA_WIDTH-1:0]    ForwardedSrcBE,
-
-    // Memory stage output
-    output logic [DATA_WIDTH-1:0]    WriteDataM,
-
-    // Writeback stage
-    input  logic [DATA_WIDTH-1:0]    ReadDataW,
-    input  logic                     RegWriteW,
-    output logic [DATA_WIDTH-1:0]    ResultW
+    // PC output
+    output logic [31:0]  pc
 );
 
-    logic [DATA_WIDTH-1:0] R1D, R2D;
-    logic [DATA_WIDTH-1:0] ImmExtD;
+    logic [31:0] pcNext;
+    logic [31:0] pcPlus4;
+    logic [31:0] pcBranch;
+    assign pcPlus4 = pc + 32'd4;
 
-    regfile rf(
+    always_ff @(posedge clk or posedge rst) begin
+        if(rst) pc <= 32'h0;
+        else    pc <= pcNext;
+    end
+
+    logic [31:0] rd1, rd2, immExt;
+
+    regfile RF (
         .clk(clk),
-        .we(RegWriteW),
-        .raddr1(Rs1D),
-        .raddr2(Rs2D),
-        .waddr(RdW),
-        .wdata(ResultW),
-        .rdata1(R1D),
-        .rdata2(R2D)
+        .we(regWrite),
+        .rs1(instr[19:15]),
+        .rs2(instr[24:20]),
+        .rd(instr[11:7]),
+        .wd(wbData),
+        .rd1(rd1),
+        .rd2(rd2)
     );
 
-    extend imm_ext(
-        .InstrD(InstrD[31:7]),
-        .ImmSrcD(ImmSrcD),
-        .ImmExtD(ImmExtD)
+    extend IMMGEN(
+        .instr(instr),
+        .immExt(immExt)
     );
 
 
-    logic [DATA_WIDTH-1:0] R1E, R2E, ImmExtE;
+    logic [31:0] srcA = aluSrcA_PC ? pc : rd1;
+    logic [31:0] srcB = aluSrc ? immExt : rd2;
 
-    flopenrc #(DATA_WIDTH) R1Ereg   (clk, rst, FlushE, ~StallE, R1D,     R1E);
-    flopenrc #(DATA_WIDTH) R2Ereg   (clk, rst, FlushE, ~StallE, R2D,     R2E);
-    flopenrc #(DATA_WIDTH) ImmEreg  (clk, rst, FlushE, ~StallE, ImmExtD, ImmExtE);
 
-    // Forwarding
-    logic [DATA_WIDTH-1:0] IEUResultM;
-
-    mux3 #(DATA_WIDTH) fwdA(R1E, ResultW, IEUResultM, ForwardAE, ForwardedSrcAE);
-    mux3 #(DATA_WIDTH) fwdB(R2E, ResultW, IEUResultM, ForwardBE, ForwardedSrcBE);
-
-    comparator #(DATA_WIDTH) cmp(
-        .a(ForwardedSrcAE),
-        .b(ForwardedSrcBE),
-        .sgnd(BranchSignedE),
-        .flags(FlagsE)
-    );
-
-    // ALU Sources
-    logic [DATA_WIDTH-1:0] SrcAE, SrcBE;
-
-    mux2 #(DATA_WIDTH) muxA(ForwardedSrcAE, PCE,      ALUSrcAE, SrcAE);
-    mux2 #(DATA_WIDTH) muxB(ForwardedSrcBE, ImmExtE,  ALUSrcBE, SrcBE);
-
-    // ALU
-    logic [DATA_WIDTH-1:0] ALUResultE;
-    logic [DATA_WIDTH-1:0] AltResultE;
+    logic [31:0] aluResult;
+    logic        cmpOut;
 
     alu ALU(
-        .alu_ctrl(ALUCtrlE),
-        .a(SrcAE),
-        .b(SrcBE),
-        .alu_out(ALUResultE)
+        .a(srcA),
+        .b(srcB),
+        .aluControl(aluControl),
+        .result(aluResult)
     );
 
-    assign AltResultE = JumpE ? PCLinkE : ImmExtE;
-
-    // ALUResultSrcE = 0 → ALU，=1 → Jump/Branch
-    mux2 #(DATA_WIDTH) res_mux(
-        ALUResultE,
-        AltResultE,
-        ALUResultSrcE,
-        IEUAdrE
+    compare CMP(
+        .funct3(instr[14:12]),
+        .rs1(rd1),
+        .rs2(rd2),
+        .taken(cmpOut)
     );
 
-    // E → M pipeline
 
-    flopenrc #(DATA_WIDTH) IEUResMreg(clk, rst, FlushM, ~StallM, IEUAdrE,       IEUResultM);
-    flopenrc #(DATA_WIDTH) WDMreg    (clk, rst, FlushM, ~StallM, ForwardedSrcBE, WriteDataM);
+    assign mem_addr  = aluResult;
+    assign mem_wdata = rd2;
 
-    // M → W pipeline
 
-    flopenrc #(DATA_WIDTH) Wreg(clk, rst, FlushW, ~StallW, IEUResultM, ResultW);
+    logic [31:0] wbData;
+    always_comb begin
+        case(resultSrc)
+            2'b00: wbData = aluResult;
+            2'b01: wbData = mem_rdata;
+            2'b10: wbData = pcPlus4;
+            default: wbData = aluResult;
+        endcase
+    end
+
+
+    logic branchTaken = branch & cmpOut;
+
+    always_comb begin
+        if (jalr)          pcNext = aluResult & ~32'b1;    // (rs1+imm) & ~1
+        else if (jump)     pcNext = pc + immExt;
+        else if (branchTaken) pcNext = pc + immExt;
+        else               pcNext = pcPlus4;
+    end
 
 endmodule
+
