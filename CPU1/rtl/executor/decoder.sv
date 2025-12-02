@@ -43,6 +43,11 @@ module decoder (
     localparam REM    = 5'd18;
     localparam REMU   = 5'd19;
 
+    localparam FPU_ADD      = 5'd0;
+    localparam FPU_SUB      = 5'd1;
+    localparam FPU_MUL      = 5'd2;
+    localparam FPU_DIV      = 5'd3;
+
     logic[6:0] opcode = instr[6:0];
     logic[2:0] funct3 = instr[14:12];
     logic[6:0] funct7 = instr[31:25];
@@ -59,7 +64,7 @@ module decoder (
         branch     = 1'b0;
         jump       = 1'b0;
         jalr       = 1'b0;
-        aluControl = ALU_ADD;
+        aluControl = ADD;
         useFPU     = 1'b0;
         fprWrite   = 1'b0;
         fpuToInt   = 1'b0;
@@ -76,20 +81,20 @@ module decoder (
             regWrite = 1'b1;
             aluSrc   = 1'b0;
             case({funct7,funct3})
-                {7'b0000000,3'b000}: aluControl = ADD;
-                {7'b0100000,3'b000}: aluControl = SUB;
-                {7'b0000000,3'b111}: aluControl = AND;
-                {7'b0000000,3'b110}: aluControl = OR;
-                {7'b0000000,3'b100}: aluControl = XOR;
-                {7'b0000000,3'b010}: aluControl = SLT;
-                {7'b0000000,3'b011}: aluControl = SLTU;
-                {7'b0000000,3'b001}: aluControl = SLL;
-                {7'b0000000,3'b101}: aluControl = SRL;
-                {7'b0100000,3'b101}: aluControl = SRA;
+                    {7'b0000000,3'b000}: aluControl = ADD;
+                    {7'b0100000,3'b000}: aluControl = SUB;
+                    {7'b0000000,3'b111}: aluControl = AND;
+                    {7'b0000000,3'b110}: aluControl = OR;
+                    {7'b0000000,3'b100}: aluControl = XOR;
+                    {7'b0000000,3'b010}: aluControl = SLT;
+                    {7'b0000000,3'b011}: aluControl = SLTU;
+                    {7'b0000000,3'b001}: aluControl = SLL;
+                    {7'b0000000,3'b101}: aluControl = SRL;
+                    {7'b0100000,3'b101}: aluControl = SRA;
 
                 // M-extension
                 // ...
-                default: aluControl = ALU_ADD;
+	                default: aluControl = ADD;
             endcase
         end
 
@@ -97,18 +102,18 @@ module decoder (
         7'b0010011: begin
             regWrite = 1'b1;
             aluSrc   = 1'b1;
-            case(funct3)
-                3'b000: aluControl = ADD;
-                3'b010: aluControl = SLT;
-                3'b011: aluControl = SLTU;
-                3'b100: aluControl = XOR;
-                3'b110: aluControl = OR;
-                3'b111: aluControl = AND;
-                3'b001: aluControl = SLL;
-                3'b101: aluControl = funct7[5] ? SRA : SRL;
+	            case(funct3)
+	                3'b000: aluControl = ADD;
+	                3'b010: aluControl = SLT;
+	                3'b011: aluControl = SLTU;
+	                3'b100: aluControl = XOR;
+	                3'b110: aluControl = OR;
+	                3'b111: aluControl = AND;
+	                3'b001: aluControl = SLL;
+	                3'b101: aluControl = funct7[5] ? SRA : SRL;
 
-                default: aluControl = ADD;
-            endcase
+	                default: aluControl = ADD;
+	            endcase
         end
 
         7'b0110111: begin // LUI
@@ -127,16 +132,16 @@ module decoder (
                 memRead    = 1'b1;
                 resultSrc  = 2'b01;
                 aluSrc     = 1'b1;
-                aluControl = ALU_ADD;
+	                aluControl = ADD;
             end
             7'b0100011: begin // Stores
                 memWrite   = 1'b1;
                 aluSrc     = 1'b1;
-                aluControl = ALU_ADD;
+	                aluControl = ADD;
             end
             7'b1100011: begin // Branches
                 branch     = 1'b1;
-                aluControl = ALU_SUB;
+	                aluControl = SUB;
             end
             7'b1101111: begin // JAL
                 jump       = 1'b1;
@@ -149,10 +154,9 @@ module decoder (
                 regWrite   = 1'b1;
                 resultSrc  = 2'b10;
                 aluSrc     = 1'b1;
-                aluControl = ALU_ADD;
+                aluControl = ADD;
             end
             default: ; // do nothing
         endcase
     end
 endmodule
-

@@ -51,4 +51,3 @@ module top (
         .a0
     );
 endmodule
-s

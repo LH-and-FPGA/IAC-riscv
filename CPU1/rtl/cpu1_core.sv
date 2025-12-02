@@ -48,8 +48,7 @@ module cpu1_core (
     logic unused_trigger;
 
     // IF stage
-    logic [31:0] pcF, pcNext, pcPlus4F;
-    logic [31:0] inc_pc_4_d_unused;
+    logic [31:0] pcF, pcPlus4F;
     logic        stallF, stallD, flushD;
     assign unused_trigger = trigger;
 
@@ -144,15 +143,19 @@ module cpu1_core (
     ifu_top ifu_i (
         .clk,
         .rst,
+        .instr_in(i_rdata),
         .StallF(stallF),
         .StallD(stallD),
         .FlushD(flushD),
-        .pc_next_override(pcNext),
-        .instrF_in(i_rdata),
+        .FlushE(1'b0),
+        .branch(takeBranchE),
+        .jump(ctrlE.jump),
+        .jalr(ctrlE.jalr),
+        .branch_pc(branchTargetE),
+        .jalr_pc(jalrTargetE),
         .pc_f(pcF),
         .inc_pc_4_f(pcPlus4F),
         .pc_d(pcD),
-        .inc_pc_4_d(inc_pc_4_d_unused),
         .instr_d(instrD),
         .i_addr(i_addr)
     );
@@ -352,14 +355,6 @@ module cpu1_core (
         .stallD,
         .flushD
     );
-    // Next PC
-    always_comb begin
-        pcNext = pcPlus4F;
-        if (takeBranchE) pcNext = branchTargetE;
-        else if (ctrlE.jump) pcNext = branchTargetE;
-        else if (ctrlE.jalr) pcNext = jalrTargetE;
-    end
-
     // EX/MEM pipeline
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -386,22 +381,22 @@ module cpu1_core (
     end
 
     // LSU
-    lsu lsu_i (
-        .memRead(ctrlM.memRead),
-        .memWrite(ctrlM.memWrite),
-        .fpLoad(ctrlM.fpLoad),
-        .fpStore(ctrlM.fpStore),
+    lsu_top lsu_i (
+        .mem_read(ctrlM.memRead),
+        .mem_write(ctrlM.memWrite),
+        .fp_load(ctrlM.fpLoad),
+        .fp_store(ctrlM.fpStore),
         .funct3(ctrlM.funct3),
         .addr(aluResultM),
-        .storeData(storeDataM),
-        .fpStoreData(fpStoreDataM),
-        .d_rdata,
-        .d_req,
-        .d_we,
-        .d_wstrb,
-        .d_addr,
-        .d_wdata,
-        .loadData(loadDataM)
+        .store_data(storeDataM),
+        .fp_store_data(fpStoreDataM),
+        .d_rdata(d_rdata),
+        .d_req(d_req),
+        .d_we(d_we),
+        .d_wstrb(d_wstrb),
+        .d_addr(d_addr),
+        .d_wdata(d_wdata),
+        .load_data(loadDataM)
     );
 
     // MEM/WB pipeline

@@ -31,6 +31,10 @@ module ifu_top #(
 
 localparam NOP = 32'h00000013; // ADDI x0, x0, 0
 
+    // FlushE reserved for future pipeline flush; mark as used to silence lint.
+    logic unused_FlushE;
+    assign unused_FlushE = FlushE;
+
 // Internal fetch stage signals
 logic [DATA_WIDTH-1:0] pc_next;
 logic [DATA_WIDTH-1:0] pc_cur;

@@ -1,17 +1,17 @@
 module alu #(
     parameter DATA_WIDTH = 32
 ) (
-    input   logic [4:0]             op,
-    input   logic [DATA_WIDTH-1:0]  a,
-    input   logic [DATA_WIDTH-1:0]  b,
-    output  logic [DATA_WIDTH-1:0]  alu_out,
-    output  logic                   eq,
-    output  logic                   lt,
-    output  logic                   ltu
+    input  logic [4:0]             op,
+    input  logic [DATA_WIDTH-1:0]  a,
+    input  logic [DATA_WIDTH-1:0]  b,
+    output logic [DATA_WIDTH-1:0]  result,
+    output logic                   cmp_eq,
+    output logic                   cmp_lt,
+    output logic                   cmp_ltu
 );
-    assign eq  = (a == b);
-    assign lt  = ($signed(a) < $signed(b)); 
-    assign ltu = ($unsigned(a) < $unsigned(b));
+    assign cmp_eq  = (a == b);
+    assign cmp_lt  = ($signed(a) < $signed(b)); 
+    assign cmp_ltu = ($unsigned(a) < $unsigned(b));
 
     typedef enum logic [4:0] {
         ADD    = 5'd0,   
