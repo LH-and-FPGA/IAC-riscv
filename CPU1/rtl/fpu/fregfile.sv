@@ -1,29 +1,43 @@
-module fregfile (
-    input  logic        clk,
-    input  logic        rst,
-    input  logic        we,
-    input  logic [4:0]  waddr,
-    input  logic [31:0] wdata,
-    input  logic [4:0]  raddr1,
-    input  logic [4:0]  raddr2,
-    output logic [31:0] rdata1,
-    output logic [31:0] rdata2
+// Simple hazard unit for forwarding, load-use stall, and flush generation.
+module hazard_unit (
+    // Execute stage info
+    input  logic        ctrlE_memRead,
+    input  logic        ctrlE_regWrite,
+    input  logic        ctrlE_jump,
+    input  logic        ctrlE_jalr,
+    input  logic [4:0]  rdE,
+    input  logic [4:0]  rs1D,
+    input  logic [4:0]  rs2D,
+    input  logic        takeBranchE,
+    // Memory/Writeback for forwarding
+    input  logic        ctrlM_regWrite,
+    input  logic [4:0]  rdM,
+    input  logic        ctrlW_regWrite,
+    input  logic [4:0]  rdW,
+    input  logic [4:0]  rs1E,
+    input  logic [4:0]  rs2E,
+    output logic [1:0]  forwardA,
+    output logic [1:0]  forwardB,
+    output logic        stallF,
+    output logic        stallD,
+    output logic        flushD
 );
-    logic [31:0] regs[31:0];
-
-    integer i;
-    always_ff @(posedge clk) begin
-        if (rst) begin
-            for (i = 0; i < 32; i = i + 1) begin
-                regs[i] <= 32'b0;
-            end
-        end else if (we) begin
-            regs[waddr] <= wdata;
-        end
-    end
-
+    // Forwarding decisions
     always_comb begin
-        rdata1 = regs[raddr1];
-        rdata2 = regs[raddr2];
+        forwardA = 2'b00;
+        forwardB = 2'b00;
+        if (ctrlM_regWrite && (rdM != 5'd0) && (rdM == rs1E)) forwardA = 2'b10;
+        else if (ctrlW_regWrite && (rdW != 5'd0) && (rdW == rs1E)) forwardA = 2'b01;
+
+        if (ctrlM_regWrite && (rdM != 5'd0) && (rdM == rs2E)) forwardB = 2'b10;
+        else if (ctrlW_regWrite && (rdW != 5'd0) && (rdW == rs2E)) forwardB = 2'b01;
     end
+
+    // Load-use hazard stall
+    assign stallF = (ctrlE_memRead && ctrlE_regWrite &&
+                    ((rdE != 5'd0) && ((rdE == rs1D) || (rdE == rs2D))));
+    assign stallD = stallF;
+
+    // Flush decode on branch/jump
+    assign flushD = takeBranchE | ctrlE_jump | ctrlE_jalr;
 endmodule
