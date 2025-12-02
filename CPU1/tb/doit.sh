@@ -39,13 +39,41 @@ for file in "${files[@]}"; do
     fi
 
     # Translate Verilog -> C++ including testbench
+    if [[ -f ${RTL_FOLDER}/${name}.sv ]]; then
+        target_sv=${RTL_FOLDER}/${name}.sv
+    elif [[ -f ${RTL_FOLDER}/cache/${name}.sv ]]; then
+        target_sv=${RTL_FOLDER}/cache/${name}.sv
+    elif [[ -f ${RTL_FOLDER}/fpu/${name}.sv ]]; then
+        target_sv=${RTL_FOLDER}/fpu/${name}.sv
+    elif [[ -f ${RTL_FOLDER}/fetch/${name}.sv ]]; then
+        target_sv=${RTL_FOLDER}/fetch/${name}.sv
+    elif [[ -f ${RTL_FOLDER}/lsu/${name}.sv ]]; then
+        target_sv=${RTL_FOLDER}/lsu/${name}.sv
+    else
+        echo "Cannot find RTL for ${name}"
+        exit 1
+    fi
+
+    # Translate Verilog -> C++ including testbench
     verilator   -Wall --trace \
-                -cc ${RTL_FOLDER}/${name}.sv \
+                -cc ${target_sv} \
                 --exe ${file} \
                 -y ${RTL_FOLDER} \
+                -y ${RTL_FOLDER}/cache \
+                -y ${RTL_FOLDER}/executor \
+                -y ${RTL_FOLDER}/fetch \
+                -y ${RTL_FOLDER}/lsu \
+                -y ${RTL_FOLDER}/fpu \
+                -y ${RTL_FOLDER}/hazard \
+                -v ${RTL_FOLDER}/cache/cache.sv \
+                -v ${RTL_FOLDER}/cache/set_assoc_cache.sv \
+                -v ${RTL_FOLDER}/cache/cacheway.sv \
+                -v ${RTL_FOLDER}/cache/addr_decode.sv \
+                -v ${RTL_FOLDER}/cache/lru.sv \
                 --prefix "Vdut" \
                 -o Vdut \
                 -LDFLAGS "-lgtest -lgtest_main -lpthread"
+
 
     # Build C++ project with automatically generated Makefile
     make -j -C obj_dir/ -f Vdut.mk
